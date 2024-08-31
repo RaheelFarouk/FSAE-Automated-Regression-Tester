@@ -7,10 +7,10 @@ import time
 with can.Bus(interface='pcan',
               channel='PCAN_USBBUS2',
               bitrate = 1000000,
-              receive_own_messages=True) as bus:
+              receive_own_messages=False) as bus:
 
    # send a message
-   message = can.Message(arbitration_id=123, is_extended_id=True,
+   message = can.Message(arbitration_id=0x123, is_extended_id=False,
                          data=[0x11, 0x22, 0x33])
    bus.send(message, timeout=0.2)
 
