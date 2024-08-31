@@ -1,8 +1,8 @@
-Message ID,Message Name,Message Length,Signal Name,Is Multiplexor,Multiplex ID,Multiplexer Signal,Start Bit,Length,Byte Order,Signed,Scale,Offset,Minimum,Maximum,Unit
-0x100,EngineData,8,EngineDataMux,TRUE,,,0,8,Little,FALSE,1,0,0,8000,rpm
-0x100,EngineData,8,EngineSpeed,FALSE,0,EngineDataMux,8,16,Little,TRUE,0.125,0,0,8000,rpm
-0x100,EngineData,8,EngineTemperature,,,,24,8,Little,FALSE,1,0,-40,215,Celsius
-0x200,VehicleStatus,8,VehicleSpeed,,,,0,16,Big,FALSE,0.1,0,0,300,kph
-0x200,VehicleStatus,8,FuelLevel,,,,16,8,Big,FALSE,0.4,0,0,100,%
-0x200,VehicleStatus,8,StartBit,,,,63,1,Big,FALSE,0.4,0,0,100,%
-0x200,VehicleStatus,8,FourBit,,,,50,4,Big,FALSE,0.4,0,0,100,%
+Message ID,Message Name,Message Length,Signal Name,Is Multiplexor,Multiplex ID,Multiplexer Signal,Start Bit,Length,Byte Order,Signed,Scale,Offset,Minimum,Maximum,Unit,Component,Firmware Variable Name,Comment
+0x100,EngineData,8,EngineDataMux,TRUE,,,0,8,Little,FALSE,1,0,0,8000,rpm,CAN Expansion FL,expansionSensor1,
+0x100,EngineData,8,EngineSpeed,FALSE,0,EngineDataMux,8,16,Little,TRUE,0.125,0,0,8000,rpm,,,
+0x100,EngineData,8,EngineTemperature,,,,24,8,Little,FALSE,1,0,-40,215,Celsius,CAN Expansion FR,expansionSensor2,
+0x200,VehicleStatus,8,VehicleSpeed,,,,0,16,Big,FALSE,0.1,0,0,300,kph,,,
+0x200,VehicleStatus,8,FuelLevel,,,,16,8,Big,FALSE,0.4,0,0,100,%,,,
+0x200,VehicleStatus,8,StartBit,,,,63,1,Big,FALSE,0.4,0,0,100,%,,,
+0x200,VehicleStatus,8,FourBit,,,,50,4,Big,FALSE,0.4,0,0,100,%,,,
