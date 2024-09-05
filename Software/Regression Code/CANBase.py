@@ -44,8 +44,8 @@ class CANInterface:
 
 
 
-canInterface = CANInterface()
-canInterface.send_can_message(can_id=0xA11, data=[0x11, 0x22, 0x33], is_extended=False)
+# canInterface = CANInterface()
+# canInterface.send_can_message(can_id=0xA11, data=[0x11, 0x22, 0x33], is_extended=False)
 
-while True:
-    print(canInterface.receive_can_message())
+# while True:
+#     print(canInterface.receive_can_message())
