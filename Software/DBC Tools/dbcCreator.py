@@ -30,7 +30,7 @@ def csv_row_to_signal(row):
     
     return Signal(
         name=name,
-        start=start+((length-1)%8),
+        start=(start+((length-1)%8)) if row['Byte Order'].lower() == 'big' else start,
         length=length,
         byte_order=byte_order,
         is_signed=is_signed,
