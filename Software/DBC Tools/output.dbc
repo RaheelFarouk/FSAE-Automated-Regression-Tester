@@ -36,16 +36,14 @@ BS_:
 BU_: 
 
 
-BO_ 256 EngineData: 8 Vector__XXX
- SG_ EngineTemperature : 31|8@1+ (1,0) [-40.0|215.0] "Celsius" Vector__XXX
- SG_ EngineSpeed m0 : 15|16@1- (0.125,0.0) [0.0|8000.0] "rpm" Vector__XXX
- SG_ EngineDataMux M : 7|8@1+ (1,0) [0.0|8000.0] "rpm" Vector__XXX
-
-BO_ 512 VehicleStatus: 8 Vector__XXX
- SG_ StartBit : 63|1@0+ (0.4,0.0) [0.0|100.0] "%" Vector__XXX
- SG_ FourBit : 53|4@0+ (0.4,0.0) [0.0|100.0] "%" Vector__XXX
- SG_ FuelLevel : 23|8@0+ (0.4,0.0) [0.0|100.0] "%" Vector__XXX
- SG_ VehicleSpeed : 7|16@0+ (0.1,0.0) [0.0|300.0] "kph" Vector__XXX
+BO_ 1 HARDINJ_command: 8 Vector__XXX
+ SG_ HARDINJ_output6Control m0 : 55|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output5Control m0 : 47|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output4Control m0 : 39|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output3Control m0 : 31|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output2Control m0 : 23|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output1Control m0 : 15|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_mux M : 7|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
 
 
 
@@ -53,8 +51,7 @@ BO_ 512 VehicleStatus: 8 Vector__XXX
 
 BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
 BA_DEF_DEF_  "GenMsgCycleTime" 0;
-BA_ "GenMsgCycleTime" BO_ 256 100;
-BA_ "GenMsgCycleTime" BO_ 512 100;
+BA_ "GenMsgCycleTime" BO_ 1 100;
 
 
 
