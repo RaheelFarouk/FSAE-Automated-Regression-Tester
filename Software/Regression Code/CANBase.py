@@ -33,8 +33,10 @@ class CANInterface:
 
     def send_can_message(self, can_id, is_extended, data):
         # send a message
-        self.message = can.Message(arbitration_id=123, is_extended_id=True,
-                                data=[0x11, 0x22, 0x33])
+        # self.message = can.Message(arbitration_id=123, is_extended_id=True,
+        #                         data=[0x11, 0x22, 0x33])
+        self.message = can.Message(arbitration_id=can_id, is_extended_id=is_extended,
+                                data=data)
         self.bus.send(self.message, timeout=0.2)
 
     # def get_can_message():
