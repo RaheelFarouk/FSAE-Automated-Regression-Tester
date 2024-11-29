@@ -1,4 +1,5 @@
 import math
+import time
 
 import cantools.database 
 from CANBase import CANInterface
@@ -23,9 +24,9 @@ data = message.encode({
 })
 
 
-def startCAN():
+def start_CAN():
     can_interface = CANInterface()
-    can_interface.send_can_message(can_id=0x001, data=data, is_extended=False)
+    can_interface.send_can_message(can_id=message.frame_id, data=data, is_extended=False)
     can_interface.__del__()
     print("test")
     assert(True==True)
@@ -36,4 +37,22 @@ def test_sqrt():
 
 def test_can():
     print(data)
-    startCAN()
+    start_CAN()
+    can_interface = CANInterface()
+    can_interface.send_and_update_can_message(can_id=0x001, data=data, is_extended=False)
+    time.sleep(10)
+    can_interface.__del__()
+    assert(True==True)
+
+def test_strain_gauge_amp():
+    dbc_directory = os.path.join(os.getcwd(), 'Software\DBC Tools\Strain Gauge DBC.dbc')
+    dbc_file = dbc_directory #'..\DBC Tools\output.dbc'
+    db = cantools.database.load_file(dbc_file)
+
+    message = db.get_message_by_name('SGAMP1_data1000Hz')
+
+    data = message.encode({
+        'SGAMP1_outputVoltage': -32768,
+        'SGAMP1_ambientTemp': 100,
+    })
+    start_CAN()
