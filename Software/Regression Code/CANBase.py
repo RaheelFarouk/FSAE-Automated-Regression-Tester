@@ -21,7 +21,7 @@ class CANInterface:
         self.is_sending = False
         self.message_list_100Hz = []
         self.message_list_100Hz_lock = threading.Lock()
-        self.message_list_100Hz_isRunning = True
+        self.message_list_100Hz_isRunning = False
         self.send_and_update_100hz_thread = threading.Thread(target=self._send_and_update_can_message_100Hz)
         # with can.Bus(interface='pcan',
         #             channel='PCAN_USBBUS2',
@@ -42,9 +42,17 @@ class CANInterface:
             # notifier = can.Notifier(self.bus, [can.Logger("recorded.log"), can.Printer()])
     
     def __del__(self):
-        self.is_sending=False
-        if self.send_and_update_thread:
-            self.send_and_update_thread.join()
+
+        if self.is_sending:    
+            self.is_sending=False
+            if self.send_and_update_thread:
+                self.send_and_update_thread.join()
+                
+        if self.message_list_100Hz_isRunning:
+            self.message_list_100Hz_isRunning = False
+            if self.send_and_update_100hz_thread:
+                self.send_and_update_100hz_thread.join()
+
         self.bus.shutdown()
 
     def send_can_message(self, can_id, is_extended, data):
@@ -85,8 +93,9 @@ class CANInterface:
     Stop Sending CAN messages at 100Hz
     '''
     def stop_send_and_update_100hz(self):
-        self.send_and_update_100hz_thread.join()
-        self.message_list_100Hz_isRunning = False
+        if self.send_and_update_100hz_thread:
+            self.message_list_100Hz_isRunning = False
+            self.send_and_update_100hz_thread.join()
 
 
 
