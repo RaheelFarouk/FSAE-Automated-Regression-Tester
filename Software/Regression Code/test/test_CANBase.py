@@ -66,9 +66,74 @@ def test_add_message_100Hz():
     time.sleep(2)
     can_interface.stop_send_and_update_100hz()
 
+def test_add_muxed_message():
+    from data.message_data import MessageData
+    message = MessageData(message=db.get_message_by_name('HARDINJ_command'), 
+                          data={
+                                'HARDINJ_mux': 0,
+                                'HARDINJ_output1Control': 127,
+                                'HARDINJ_output2Control': 200,
+                                'HARDINJ_output3Control': 200,
+                                'HARDINJ_output4Control': 200,
+                                'HARDINJ_output5Control': 200,
+                                'HARDINJ_output6Control': 200,
+                                }
+    )
+
+    message2 = MessageData(message=db.get_message_by_name('HARDINJ_command'), 
+                           data={
+                                'HARDINJ_mux': 1,
+                                'HARDINJ_output7Control': 0,
+                                'HARDINJ_output8Control': 10,
+                                'HARDINJ_output9Control': 10,
+                                'HARDINJ_output10Control': 10,
+                                'HARDINJ_output11Control': 10,
+                                'HARDINJ_output12Control': 10,
+                                }
+    )
+
+    message1_1 = MessageData(message=db.get_message_by_name('HARDINJ_command'),
+                             data={
+                                'HARDINJ_mux': 0,
+                                'HARDINJ_output1Control': 127,
+                                'HARDINJ_output2Control': 127,
+                                'HARDINJ_output3Control': 127,
+                                'HARDINJ_output4Control': 200,
+                                'HARDINJ_output5Control': 200,
+                                'HARDINJ_output6Control': 200,                                 
+                                }
+    )
 
 
-test_add_message_100Hz()
+    can_interface = CANInterface()
+    can_interface.start_send_and_update_100Hz()
+    # can_interface.send_and_update_can_message(can_id=message.frame_id, data=data, is_extended=False)
+    # can_interface.send_and_update_can_message_100Hz(can_frame=message)
+    can_interface.add_message_100Hz(message)
+    time.sleep(2)
+    can_interface.add_message_100Hz(message2)
+    time.sleep(2)
+    can_interface.add_message_100Hz(message1_1)
+    time.sleep(2)
+
+    message2.data = {
+                    'HARDINJ_mux': 1,
+                    'HARDINJ_output7Control': 0,
+                    'HARDINJ_output8Control': 127,
+                    'HARDINJ_output9Control': 127,
+                    'HARDINJ_output10Control': 127,
+                    'HARDINJ_output11Control': 10,
+                    'HARDINJ_output12Control': 10,
+                    }
+
+    can_interface.add_message_100Hz(message2)
+    time.sleep(2)
+    can_interface.stop_send_and_update_100hz()
+
+
+
+# test_add_message_100Hz()
+test_add_muxed_message()
 
 time.sleep(10)
 # can_interface.__del__()

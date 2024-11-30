@@ -96,19 +96,43 @@ class CANInterface:
     @can_message: the cantools Message object that you want to send 
     '''
     def add_message_100Hz(self, can_message: MessageData):
+        mux_updated = False
+
         if self.message_list_100Hz_isRunning:
             with self.message_list_100Hz_lock:
                 
                 #check if message doesnt exist in the array, if it doesnt append. If it does replace the message
                 if not any(message.message.frame_id == can_message.message.frame_id for message in self.message_list_100Hz):
+                    #if the message doesnt exist we dont need to worry about any mutiplexors so we just add the message
                     self.message_list_100Hz.append(can_message)
                     print(f"Appended {can_message.message.name} to 100Hz List")
                 else:
-                    for i in range (len(self.message_list_100Hz)):
-                        if self.message_list_100Hz[i].message.frame_id == can_message.message.frame_id:
-                            self.message_list_100Hz[i] = can_message
-                            print(f"Updated {can_message.message.name} in 100Hz List")
-                            break
+                    # we will handle muiplexed messages sepeartely from the standard ones
+                    # check if the message is multiplexed, if so we are going to look at whether the specific muxed message is already added
+                    if can_message.message.is_multiplexed():
+                        # if multipled loop through and find the matching frame_id
+                        for i in range (len(self.message_list_100Hz)):
+                            if self.message_list_100Hz[i].message.frame_id == can_message.message.frame_id:
+                                # if frame_id is found then we can look for the multiplexor signal and then see if the value of the mux 
+                                #   is the same as what we are trying to add. If it is we will replace that whole message
+                                for signal in self.message_list_100Hz[i].message.signals:
+                                    if signal.is_multiplexer:
+                                        if self.message_list_100Hz[i].data[signal.name] == can_message.data[signal.name]:
+                                            print("Found Mux signal in message, updating message")
+                                            self.message_list_100Hz[i] = can_message
+                                            mux_updated = True
+
+                        # if we didnt find the frame and/or mux ID in the array we will add it to it  
+                        if not mux_updated:
+                            self.message_list_100Hz.append(can_message)
+                            print("Mux signal not found in message, appending message")                          
+
+                    else:
+                        for i in range (len(self.message_list_100Hz)):
+                            if self.message_list_100Hz[i].message.frame_id == can_message.message.frame_id:
+                                self.message_list_100Hz[i] = can_message
+                                print(f"Updated {can_message.message.name} in 100Hz List")
+                                break
 
                 
 
