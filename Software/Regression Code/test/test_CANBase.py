@@ -30,7 +30,7 @@ def test_add_message_100Hz():
                                 }
     )
 
-    message2 = MessageData(message=db.get_message_by_name('HARDINJ_command2'), 
+    message2 = MessageData(message=db.get_message_by_name('HARDINJ_command'), 
                           data={
                                 'HARDINJ_mux': 0,
                                 'HARDINJ_output1Control': 0,

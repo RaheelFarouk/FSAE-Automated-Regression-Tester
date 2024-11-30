@@ -46,7 +46,7 @@ message_data_class = MessageData(message=db.get_message_by_name('HARDINJ_command
                                  data={
                                         'HARDINJ_mux': 0,
                                         'HARDINJ_output1Control': 127,
-                                        'HARDINJ_output2Control': 200,
+                                        'HARDINJ_output2Control': 127,
                                         'HARDINJ_output3Control': 200,
                                         'HARDINJ_output4Control': 200,
                                         'HARDINJ_output5Control': 200,
