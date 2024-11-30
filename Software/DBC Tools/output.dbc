@@ -37,11 +37,23 @@ BU_:
 
 
 BO_ 1 HARDINJ_command: 8 Vector__XXX
+ SG_ HARDINJ_output18Control m2 : 55|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output12Control m1 : 55|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_output6Control m0 : 55|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output17Control m2 : 47|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output11Control m1 : 47|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_output5Control m0 : 47|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output16Control m2 : 39|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output10Control m1 : 39|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_output4Control m0 : 39|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output15Control m2 : 31|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output9Control m1 : 31|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_output3Control m0 : 31|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output14Control m2 : 23|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output8Control m1 : 23|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_output2Control m0 : 23|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output13Control m2 : 15|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
+ SG_ HARDINJ_output7Control m1 : 15|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_output1Control m0 : 15|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
  SG_ HARDINJ_mux M : 7|8@0+ (1,0) [0.0|255.0] "" Vector__XXX
 
