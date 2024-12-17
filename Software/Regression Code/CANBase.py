@@ -3,6 +3,7 @@ import time
 import threading
 import logging
 import cantools
+import cantools.database
 
 from data.message_data import MessageData
 
@@ -23,23 +24,12 @@ class CANInterface:
         self.message_list_100Hz_lock = threading.Lock()
         self.message_list_100Hz_isRunning = False
         self.send_and_update_100hz_thread = threading.Thread(target=self._send_and_update_can_message_100Hz)
-        # with can.Bus(interface='pcan',
-        #             channel='PCAN_USBBUS2',
-        #             bitrate = 1000000,
-        #             receive_own_messages=True) as self.bus:
 
-            # # send a message
-            # self.message = can.Message(arbitration_id=123, is_extended_id=True,
-            #                         data=[0x11, 0x22, 0x33])
-            # self.bus.send(self.message, timeout=0.2)
-
-            # # iterate over received messages
-            # for msg in bus:
-            #     print(f"{msg.arbitration_id:X}: {msg.data}")
-            #     #    time.sleep(1)
-
-            # # or use an asynchronous notifier
-            # notifier = can.Notifier(self.bus, [can.Logger("recorded.log"), can.Printer()])
+        #receive signal dictionary
+        self.receive_dictionary = {}
+        self.receive_dictionary_lock = threading.Lock()
+        self.receive_dictionary_isRunning = False
+        self.receive_dictionary_thread = threading.Thread(target=self._receive_and_sort)
     
     def __del__(self):
 
@@ -55,10 +45,13 @@ class CANInterface:
 
         self.bus.shutdown()
 
+    '''
+    Send can message funciton will send a singular CAN message with the parameters specified
+    @can_id: the CAN ID of the message you want to send
+    @is_extended: whether the ID uses extended messaging or not 
+    @return: None
+    '''
     def send_can_message(self, can_id, is_extended, data):
-        # send a message
-        # self.message = can.Message(arbitration_id=123, is_extended_id=True,
-        #                         data=[0x11, 0x22, 0x33])
         self.message = can.Message(arbitration_id=can_id, is_extended_id=is_extended,
                                 data=data)
         self.bus.send(self.message, timeout=0.2)
@@ -136,6 +129,7 @@ class CANInterface:
                             self.message_list_100Hz.append(can_message)
                             print("Mux signal not found in message, appending message")                          
 
+                    # If its a standard meessage and was found in the array then we just update the message here
                     else:
                         for i in range (len(self.message_list_100Hz)):
                             if self.message_list_100Hz[i].message.frame_id == can_message.message.frame_id:
@@ -175,8 +169,79 @@ class CANInterface:
             time.sleep(0.01)
     # def get_can_message():
     #     self.bus.
-    def receive_can_message(self, timeout=None):
-        return self.bus.recv(timeout=timeout)
+    def receive_can_message(self, signal_id, timeout=None):
+        message = self.bus.recv(timeout=timeout)
+        while message.arbitration_id != signal_id:
+            message = self.bus.recv(timeout=timeout)       
+        return message
+
+    
+
+    # TODO: Document the functions below
+    def start_receive_and_sort(self, can_db:cantools.database, timeout):
+        self.receive_dictionary_thread = threading.Thread(target=self._receive_and_sort, args=(can_db, timeout))
+        self.receive_dictionary_isRunning = True
+        self.receive_dictionary_thread.start()
+
+    '''
+    Stop Sending CAN messages at 100Hz
+    '''
+    def stop_receive_and_sort(self):
+        if self.receive_dictionary_thread:
+            self.receive_dictionary_isRunning = False
+            self.receive_dictionary_thread.join()
+    
+    def _receive_and_sort(self, can_db:cantools.database, timeout):
+        self.receive_dictionary = {}
+        while self.receive_dictionary_isRunning:
+            with self.receive_dictionary_lock:
+                message = self.bus.recv(timeout=timeout)
+
+                if message:
+                    try:
+                        # Get the corresponding message object from the DBC
+                        db_message = can_db.get_message_by_frame_id(message.arbitration_id)
+                        
+                        # Decode the message data
+                        decoded_data = db_message.decode(message.data)
+                        
+                        # Check if the message is multiplexed
+                        if db_message.is_multiplexed:
+                            multiplexer_signal = None
+
+                            for signal in db_message.signals:
+                                if signal.is_multiplexer:
+                                    multiplexer_signal = signal.name
+                                    break
+
+                            if multiplexer_signal:
+                                # Get the current multiplexor value
+                                multiplexer_value = decoded_data[multiplexer_signal]
+                                
+                                # Extract only the signals for the current multiplexor value
+                                # print(f"Message is multiplexed with {multiplexer_signal}={multiplexer_value}")
+                                for signal in db_message.signals:
+                                    if signal.multiplexer_ids is None or multiplexer_value in signal.multiplexer_ids:
+                                        self.receive_dictionary[signal.name] = decoded_data[signal.name]
+
+                        else:
+                            # For non-multiplexed messages, store all signals
+                            for signal_name, signal_value in decoded_data.items():
+                                self.receive_dictionary[signal_name] = signal_value
+                    
+                        # print(f"Updated signal dictionary: {self.receive_dictionary}")
+
+                    except KeyError:
+                        # print(f"Message with ID {hex(message.arbitration_id)} not found in DBC.")
+                        pass
+
+    def get_signal_from_dictionary(self, signal_name):
+        if self.receive_dictionary_isRunning:
+            with self.receive_dictionary_lock:
+                return_signal = self.receive_dictionary[signal_name]
+        print(return_signal)
+        return return_signal 
+
 
 
 
