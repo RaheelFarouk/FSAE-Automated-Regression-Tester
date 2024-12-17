@@ -12,7 +12,7 @@ sys.path.insert(0, parent_dir)
 
 from CANBase import CANInterface
 
-dbc_directory = os.path.join(os.getcwd(), 'Software\DBC Tools\output.dbc')
+dbc_directory = os.path.join(os.getcwd(), 'Software\DBC Tools\HardwareInjector.dbc')
 dbc_file = dbc_directory #'..\DBC Tools\output.dbc'
 db = cantools.database.load_file(dbc_file)
 
@@ -72,7 +72,7 @@ def test_add_muxed_message():
                           data={
                                 'HARDINJ_mux': 0,
                                 'HARDINJ_output1Control': 127,
-                                'HARDINJ_output2Control': 200,
+                                'HARDINJ_output2Control': 0,
                                 'HARDINJ_output3Control': 200,
                                 'HARDINJ_output4Control': 200,
                                 'HARDINJ_output5Control': 200,
@@ -131,9 +131,24 @@ def test_add_muxed_message():
     can_interface.stop_send_and_update_100hz()
 
 
+def test_receieve():
+    can_interface = CANInterface()
+
+    can_interface.start_receive_and_sort(can_db=db, timeout=2)
+
+    time.sleep(2)
+
+    can_interface.get_signal_from_dictionary('HARDINJ_output7Control')
+    time.sleep(10)
+    can_interface.get_signal_from_dictionary('HARDINJ_output7Control')
+    time.sleep(2)
+
+
+
 
 # test_add_message_100Hz()
-test_add_muxed_message()
+# test_add_muxed_message()
+test_receieve()
 
 time.sleep(10)
 # can_interface.__del__()
