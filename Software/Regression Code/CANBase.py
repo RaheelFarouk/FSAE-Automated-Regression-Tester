@@ -194,52 +194,57 @@ class CANInterface:
     def _receive_and_sort(self, can_db:cantools.database, timeout):
         self.receive_dictionary = {}
         while self.receive_dictionary_isRunning:
-            with self.receive_dictionary_lock:
-                message = self.bus.recv(timeout=timeout)
+            message = self.bus.recv(timeout=timeout)
 
-                if message:
-                    try:
-                        # Get the corresponding message object from the DBC
-                        db_message = can_db.get_message_by_frame_id(message.arbitration_id)
-                        
-                        # Decode the message data
-                        decoded_data = db_message.decode(message.data)
-                        
-                        # Check if the message is multiplexed
-                        if db_message.is_multiplexed:
-                            multiplexer_signal = None
+            if message:
+                try:
+                    # Get the corresponding message object from the DBC
+                    db_message = can_db.get_message_by_frame_id(message.arbitration_id)
+                    
+                    # Decode the message data
+                    decoded_data = db_message.decode(message.data)
+                    
+                    # Check if the message is multiplexed
+                    if db_message.is_multiplexed():
+                        multiplexer_signal = None
 
+                        for signal in db_message.signals:
+                            if signal.is_multiplexer:
+                                multiplexer_signal = signal.name
+                                break
+
+                        if multiplexer_signal:
+                            # Get the current multiplexor value
+                            multiplexer_value = decoded_data[multiplexer_signal]
+                            
+                            # Extract only the signals for the current multiplexor value
+                            # print(f"Message is multiplexed with {multiplexer_signal}={multiplexer_value}")
                             for signal in db_message.signals:
-                                if signal.is_multiplexer:
-                                    multiplexer_signal = signal.name
-                                    break
-
-                            if multiplexer_signal:
-                                # Get the current multiplexor value
-                                multiplexer_value = decoded_data[multiplexer_signal]
-                                
-                                # Extract only the signals for the current multiplexor value
-                                # print(f"Message is multiplexed with {multiplexer_signal}={multiplexer_value}")
-                                for signal in db_message.signals:
-                                    if signal.multiplexer_ids is None or multiplexer_value in signal.multiplexer_ids:
+                                if signal.multiplexer_ids is None or multiplexer_value in signal.multiplexer_ids:
+                                    with self.receive_dictionary_lock:
                                         self.receive_dictionary[signal.name] = decoded_data[signal.name]
 
-                        else:
-                            # For non-multiplexed messages, store all signals
-                            for signal_name, signal_value in decoded_data.items():
+                    else:
+                        # For non-multiplexed messages, store all signals
+                        for signal_name, signal_value in decoded_data.items():
+                            with self.receive_dictionary_lock:
                                 self.receive_dictionary[signal_name] = signal_value
-                    
-                        # print(f"Updated signal dictionary: {self.receive_dictionary}")
+                
+                    # print(f"Updated signal dictionary: {self.receive_dictionary}")
 
-                    except KeyError:
-                        # print(f"Message with ID {hex(message.arbitration_id)} not found in DBC.")
-                        pass
+                except KeyError:
+                    # print(f"Message with ID {hex(message.arbitration_id)} not found in DBC.")
+                    pass
 
     def get_signal_from_dictionary(self, signal_name):
         if self.receive_dictionary_isRunning:
             with self.receive_dictionary_lock:
-                return_signal = self.receive_dictionary[signal_name]
-        print(return_signal)
+                try:
+                    return_signal = self.receive_dictionary[signal_name]
+                except KeyError as e:
+                    print(f"Key Not found: {e}")
+                    return_signal = 0
+        # print(return_signal)
         return return_signal 
 
 
