@@ -54,7 +54,7 @@ with open(file_path, mode='r', newline='') as csvfile:
 
         motor_rpm = can_interface.get_signal_from_dictionary('motorspeed')
         try:
-            motor_rpm = int(motor_rpm)
+            motor_rpm = abs(int(motor_rpm))
         except:
             motor_rpm=10000 #failsafe: we will reduce the torque to almost 0 in the event the rpm is not valid
 
