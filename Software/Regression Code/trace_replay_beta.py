@@ -53,14 +53,10 @@ with open(file_path, mode='r', newline='') as csvfile:
         loop_start_time = time.time()
 
         motor_rpm = can_interface.get_signal_from_dictionary('motorspeed')
-        # motor_rpm = can_interface.get_signal_from_dictionary('VCU_vehicleSpeed')
-        # motor_rpm = can_interface.get_signal_from_dictionary('VCU_rollRate')
-        # print(motor_rpm)
         try:
             motor_rpm = int(motor_rpm)
         except:
-            motor_rpm=1.0
-        # motor_rpm = 0
+            motor_rpm=10000 #failsafe: we will reduce the torque to almost 0 in the event the rpm is not valid
 
         # Handle 0 rpm case
         # Default to the torque request
@@ -81,10 +77,7 @@ with open(file_path, mode='r', newline='') as csvfile:
                 print(f"Error reading torque from CSV:{e}")
 
         tp_request = torque_request/1.5
-        # print(tp_request)
 
-        # print(row[1])
-        # tp_request = int(float(row[1])*255/5)
         tp_request = max(0, tp_request)
         tp_request = min(100, tp_request)
         hfi_command_mux0.data={
@@ -98,11 +91,8 @@ with open(file_path, mode='r', newline='') as csvfile:
                                 }
         
         can_interface.send_can_message(can_id=hfi_command_mux0.message.frame_id, is_extended=False, data=hfi_command_mux0.encode_data())
-        # print(hfi_command_mux0.encode_data())
 
-        # print(hfi_command_mux0.data['HARDINJ_output1Control'])
-        # print(data)
-        #perform calculation and set message here
+        #calculate loop time and delay accordingly
         loop_elapsed_time = time.time() - loop_start_time
         time_to_sleep = 0.01 - loop_elapsed_time
         if time_to_sleep > 0:
