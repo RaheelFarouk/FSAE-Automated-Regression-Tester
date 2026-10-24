@@ -63,6 +63,7 @@ def test_add_message_100Hz():
                     }
 
     can_interface.add_message_100Hz(message2)
+    print(message2.encode_data())
     time.sleep(2)
     can_interface.stop_send_and_update_100hz()
 
@@ -146,9 +147,9 @@ def test_receieve():
 
 
 
-# test_add_message_100Hz()
+test_add_message_100Hz()
 # test_add_muxed_message()
-test_receieve()
+# test_receieve()
 
 time.sleep(10)
 # can_interface.__del__()
